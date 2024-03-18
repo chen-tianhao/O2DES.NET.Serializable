@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version Condition=" '$(BUILD_BUILDNUMBER)' == '' ">1.0.0.0</Version>
+    <Version Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(BUILD_BUILDNUMBER)</Version>
+    <TargetFramework>netstandard2.1</TargetFramework>
+	  <LangVersion>9.0</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Li Haobin</Authors>
+    <Description>A framework for Object-Oriented Discrete Event Simulation</Description>
+    <Company>ISEM Department, National University of Singapore</Company>
+    <Copyright>Copyright © 2015-2019 O²DES.NET</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>http://www.o2des.net</PackageProjectUrl>
+    <PackageIconUrl>http://www.o2des.net/wp-content/uploads/2016/10/o2des.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/li-haobin/O2DES.Net</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>O2DES.Net Discrete-Event Simulation</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="4.8.1" />
+    <PackageReference Include="System.Drawing.Common" Version="4.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
