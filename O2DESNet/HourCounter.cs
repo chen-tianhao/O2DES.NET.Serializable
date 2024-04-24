@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -90,7 +91,8 @@ namespace O2DESNet
     }
     public class HourCounter : IHourCounter, IDisposable
     {
-        private ISandbox _sandbox;
+        [JsonProperty("_sandbox")]
+        private Sandbox _sandbox;
         private DateTime _initialTime;
         public DateTime LastTime { get; private set; }
         public double LastCount { get; private set; }
@@ -167,15 +169,16 @@ namespace O2DESNet
         }
         #endregion
 
-        internal HourCounter(ISandbox sandbox, bool keepHistory = false)         
+        HourCounter() { }
+        internal HourCounter(Sandbox sandbox, bool keepHistory = false)         
         {
             Init(sandbox, DateTime.MinValue, keepHistory); 
         }
-        internal HourCounter(ISandbox sandbox, DateTime initialTime, bool keepHistory = false) 
+        internal HourCounter(Sandbox sandbox, DateTime initialTime, bool keepHistory = false) 
         {
             Init(sandbox, initialTime, keepHistory); 
         }
-        private void Init(ISandbox sandbox, DateTime initialTime, bool keepHistory)
+        private void Init(Sandbox sandbox, DateTime initialTime, bool keepHistory)
         {
             _sandbox = sandbox;
             _initialTime = initialTime;

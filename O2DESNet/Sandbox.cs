@@ -34,7 +34,7 @@ namespace O2DESNet
             : base(seed, id, pointer) { Assets = assets; }
     }
 
-    public abstract class Sandbox : ISandbox
+    public class Sandbox : ISandbox
     {
         private static int _count = 0;
         /// <summary>
