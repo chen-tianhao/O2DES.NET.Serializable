@@ -93,6 +93,7 @@ namespace O2DESNet
     {
         [JsonProperty("_sandbox")]
         private Sandbox _sandbox;
+        [JsonProperty("_initialTime")]
         private DateTime _initialTime;
         public DateTime LastTime { get; private set; }
         public double LastCount { get; private set; }
@@ -154,6 +155,7 @@ namespace O2DESNet
         public bool Paused { get; private set; }
 
         #region For history keeping
+        [JsonProperty("_history")]
         private Dictionary<DateTime, double> _history;
         public bool KeepHistory { get; private set; }
         /// <summary>
@@ -170,6 +172,19 @@ namespace O2DESNet
         #endregion
 
         HourCounter() { }
+        [JsonConstructor]
+        public HourCounter(DateTime lastTime, double lastCount, double totalIncrement, double totalDecrement, 
+                            double totalHours, double cumValue, bool paused, bool keepHistory)
+        {
+            LastTime = lastTime;
+            LastCount = lastCount;
+            TotalIncrement = totalIncrement;
+            TotalDecrement = totalDecrement;
+            TotalHours = totalHours;
+            CumValue = cumValue;
+            Paused = paused;
+            KeepHistory = keepHistory;
+        }
         internal HourCounter(Sandbox sandbox, bool keepHistory = false)         
         {
             Init(sandbox, DateTime.MinValue, keepHistory); 
@@ -194,8 +209,9 @@ namespace O2DESNet
         public void ObserveCount(double count)
         {
             var clockTime = _sandbox.ClockTime;
-            if (clockTime < LastTime)
-                throw new Exception("Time of new count cannot be earlier than current time.");
+            // The following check is disabled due to deserialization requirement
+            // if (clockTime < LastTime)
+            //     throw new Exception("Time of new count cannot be earlier than current time.");
             if (!Paused)
             {
                 var hours = (clockTime - LastTime).TotalHours;
@@ -376,6 +392,7 @@ namespace O2DESNet
             return histogram;
         }
 
+        [JsonProperty("_logFile")]
         private string _logFile;
         public string LogFile
         {
@@ -391,7 +408,8 @@ namespace O2DESNet
                     };
             }
         }
-        
+
+        [JsonProperty("ReadOnly")]
         private ReadOnlyHourCounter ReadOnly { get; set; } = null;
         public ReadOnlyHourCounter AsReadOnly()
         {
