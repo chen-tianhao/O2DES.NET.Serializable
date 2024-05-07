@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,6 +37,7 @@ namespace O2DESNet
 
     public class Sandbox : ISandbox
     {
+        [JsonProperty("_count")]
         private static int _count = 0;
         /// <summary>
         /// Unique index in sequence for all module instances 
@@ -44,14 +46,17 @@ namespace O2DESNet
         /// <summary>
         /// Tag of the instance of the module
         /// </summary>
-        public string Id { get; private set; }        
+        public string Id { get; private set; }
         public Pointer Pointer { get; private set; }
+        [JsonProperty("DefaultRS")]
         protected Random DefaultRS { get; private set; }
+        [JsonProperty("_seed")]
         private int _seed;
         public int Seed { get { return _seed; } set { _seed = value; DefaultRS = new Random(_seed); } }
-        
+
         #region Future Event List
-        internal SortedSet<Event> FutureEventList = new SortedSet<Event>(EventComparer.Instance);        
+        // [JsonProperty("FutureEventList")]
+        internal SortedSet<Event> FutureEventList = new SortedSet<Event>(EventComparer.Instance);
         /// <summary>
         /// Schedule an event to be invoked at the specified clock-time
         /// </summary>
@@ -81,7 +86,7 @@ namespace O2DESNet
             get
             {
                 var headEvent = FutureEventList.FirstOrDefault();
-                foreach(Sandbox child in Children_List)
+                foreach (Sandbox child in Children_List)
                 {
                     var childHeadEvent = child.HeadEvent;
                     if (headEvent == null || (childHeadEvent != null &&
@@ -91,6 +96,8 @@ namespace O2DESNet
                 return headEvent;
             }
         }
+        public Event GetHeadEvent() { return HeadEvent; }
+        [JsonProperty("_clockTime")]
         private DateTime _clockTime = DateTime.MinValue;
         public DateTime ClockTime
         {
@@ -111,9 +118,11 @@ namespace O2DESNet
         }
         public bool Run()
         {
-            if (Parent != null) return Parent.Run();
+            if (Parent != null) 
+                return Parent.Run();
             var head = HeadEvent;
-            if (head == null) return false;
+            if (head == null) 
+                return false;
             head.Owner.FutureEventList.Remove(head);
             _clockTime = head.ScheduledTime;
             head.Invoke();
@@ -140,11 +149,14 @@ namespace O2DESNet
         }
         public bool Run(int eventCount)
         {
-            if (Parent != null) return Parent.Run(eventCount);
+            if (Parent != null) 
+                return Parent.Run(eventCount);
             while (eventCount-- > 0)
-                if (!Run()) return false;
+                if (!Run()) 
+                    return false;
             return true;
         }
+        [JsonProperty("_realTimeForLastRun")]
         private DateTime? _realTimeForLastRun = null;
         public bool Run(double speed)
         {
@@ -159,6 +171,7 @@ namespace O2DESNet
 
         #region Children - Sub-modules
         public ISandbox Parent { get; private set; } = null;
+        [JsonProperty("Children_List")]
         private readonly List<ISandbox> Children_List = new List<ISandbox>();
         public IReadOnlyList<ISandbox> Children { get { return Children_List.AsReadOnly(); } }
         protected TSandbox AddChild<TSandbox>(TSandbox child) where TSandbox : Sandbox
@@ -169,6 +182,7 @@ namespace O2DESNet
             return child;
         }
         protected IReadOnlyList<HourCounter> HourCounters { get { return HourCounters_List.AsReadOnly(); } }
+        [JsonProperty("HourCounters_List")]
         private readonly List<HourCounter> HourCounters_List = new List<HourCounter>();
         protected HourCounter AddHourCounter(bool keepHistory = false)
         {
@@ -186,6 +200,16 @@ namespace O2DESNet
             Id = id;
             Pointer = pointer;
             OnWarmedUp += WarmedUpHandler;
+        }
+        
+        [JsonConstructor]
+        public Sandbox(int index, string id, Pointer pointer, Random defaultRS, ISandbox parent) 
+        {
+            Index = index;
+            Id = id;
+            Pointer = pointer;
+            DefaultRS = defaultRS;
+            Parent = parent;
         }
 
         public override string ToString()
@@ -214,6 +238,7 @@ namespace O2DESNet
         #endregion
 
         #region For Logging
+        [JsonProperty("_logFile")]
         private string _logFile;
         public string LogFile
         {

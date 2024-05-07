@@ -17,7 +17,8 @@ namespace SerializationTest
 
             Q++;
             HC_Queue.ObserveChange(1);
-            if (S == 0) Start();
+            if (S == 0)
+                Schedule(Start);
         }
 
         void Start()
