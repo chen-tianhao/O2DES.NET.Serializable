@@ -55,28 +55,77 @@ namespace O2DESNet
         public int Seed { get { return _seed; } set { _seed = value; DefaultRS = new Random(_seed); } }
 
         #region Future Event List
-        // [JsonProperty("FutureEventList")]
-        internal SortedSet<Event> FutureEventList = new SortedSet<Event>(EventComparer.Instance);
+        [JsonProperty("FutureEventList")]
+        // internal SortedSet<Event> FutureEventList = new SortedSet<Event>(EventComparer.Instance);
+        internal List<Event> FutureEventList = new List<Event>();
+        public string PrintFEL()
+        {
+            string s = "";
+            foreach(Event e in FutureEventList)
+            {
+                s+=e.Tag;
+            }
+            return s;
+        }
+        public void AddWithOrder(Action action, DateTime clockTime, string tag = null)
+        {
+            Event evt = new Event(this, action, clockTime, tag);
+            if (FutureEventList.Count == 0)
+            {
+                FutureEventList.Add(evt);
+            }
+            else
+            {
+                int i = 0;
+                for (i = 0; i < FutureEventList.Count; i++)
+                {
+                    Event e = FutureEventList[0];
+                    if (e != null)
+                    {
+                        if (e.ScheduledTime.CompareTo(evt.ScheduledTime) > 0)
+                        {
+                            FutureEventList.Insert(i, evt);
+                            break;
+                        }
+                        else if (e.ScheduledTime.CompareTo(evt.ScheduledTime) == 0)
+                        {
+                            if (e.Index.CompareTo(evt.Index) > 0)
+                            {
+                                FutureEventList.Insert(i, evt);
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (i == FutureEventList.Count)
+                {
+                    FutureEventList.Add(evt);
+                }
+            }
+        }
         /// <summary>
         /// Schedule an event to be invoked at the specified clock-time
         /// </summary>
         protected void Schedule(Action action, DateTime clockTime, string tag = null)
         {
-            FutureEventList.Add(new Event(this, action, clockTime, tag));
+            // FutureEventList.Add(new Event(this, action, clockTime, tag));
+            AddWithOrder(action, clockTime, tag);
         }
         /// <summary>
         /// Schedule an event to be invoked after the specified time delay
         /// </summary>
         protected void Schedule(Action action, TimeSpan delay, string tag = null)
         {
-            FutureEventList.Add(new Event(this, action, ClockTime + delay, tag));
+            // FutureEventList.Add(new Event(this, action, ClockTime + delay, tag));
+            AddWithOrder(action, ClockTime + delay, tag);
         }
         /// <summary>
         /// Schedule an event at the current clock time.
         /// </summary>
         protected void Schedule(Action action, string tag = null)
         {
-            FutureEventList.Add(new Event(this, action, ClockTime, tag));
+            // FutureEventList.Add(new Event(this, action, ClockTime, tag));
+            AddWithOrder(action, ClockTime, tag);
         }
         #endregion
 
