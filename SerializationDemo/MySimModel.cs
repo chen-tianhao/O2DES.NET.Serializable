@@ -1,13 +1,17 @@
-﻿using O2DESNet;
+﻿using Newtonsoft.Json;
+using O2DESNet;
 
 namespace SerializationTest
 {
     class MySimModel : Sandbox
     {
-        int Q = 0;
-        int S = 0;
+        [JsonProperty("Q")]
+        private int Q = 0;
+        [JsonProperty("S")]
+        private int S = 0;
         public HourCounter HC_Queue;
         public HourCounter HC_Server;
+        public int Dummy { get; private set; }
 
         void Arrive()
         {
@@ -47,6 +51,12 @@ namespace SerializationTest
             Schedule(Arrive);
             HC_Queue = AddHourCounter();
             HC_Server = AddHourCounter();
+        }
+
+        [JsonConstructor]
+        public MySimModel(int dummy)
+        {
+            Dummy = dummy;
         }
     }
 }

@@ -230,13 +230,9 @@ namespace O2DESNet
             OnWarmedUp += child.OnWarmedUp;
             return child;
         }
-        protected IReadOnlyList<HourCounter> HourCounters { get { return HourCounters_List.AsReadOnly(); } }
-        [JsonProperty("HourCounters_List")]
-        private readonly List<HourCounter> HourCounters_List = new List<HourCounter>();
         protected HourCounter AddHourCounter(bool keepHistory = false)
         {
             var hc = new HourCounter(this, keepHistory);
-            HourCounters_List.Add(hc);
             OnWarmedUp += () => hc.WarmedUp();
             return hc;
         }
@@ -317,7 +313,6 @@ namespace O2DESNet
         public virtual void Dispose()
         {
             foreach (var child in Children_List) child.Dispose();
-            foreach (var hc in HourCounters_List) hc.Dispose();
         }
     }
 }
